@@ -1,9 +1,10 @@
 {
-  "Port":8000,
-  "ForwardingTargets":[
+  "Port": 8000,
+  "ForwardingTargets": [
     {
       "Server": "localhost",
-      "Port": 20001
+      "Port": 20001,
+      "Primary": true
     },
     {
       "Server": "localhost",
