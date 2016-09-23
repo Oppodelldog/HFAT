@@ -1,0 +1,13 @@
+{
+  "Port":8000,
+  "ForwardingTargets":[
+    {
+      "Server": "localhost",
+      "Port": 20001
+    },
+    {
+      "Server": "localhost",
+      "Port": 20002
+    }
+  ]
+}
