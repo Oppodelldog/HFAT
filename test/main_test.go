@@ -3,12 +3,11 @@ package test
 import (
 	"HFAT/server"
 	"bytes"
-	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strconv"
-	"strings"
 	"testing"
+	"io/ioutil"
 )
 
 const TEST_SERVER_1_PORT = 10000
@@ -31,7 +30,7 @@ func TestTimeConsuming(t *testing.T) {
 		{Server: LOCALHOST, Port: TEST_SERVER_2_PORT, Primary: true},
 	})
 
-	testRequest, err := http.NewRequest("GET", "http://"+LOCALHOST+":"+strconv.Itoa(HFAT_SERVER_PORT)+TEST_PATH_AND_QUERY, bytes.NewBufferString(""))
+	testRequest, err := http.NewRequest("GET", "http://" + LOCALHOST + ":" + strconv.Itoa(HFAT_SERVER_PORT) + TEST_PATH_AND_QUERY, bytes.NewBufferString(""))
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,24 +63,13 @@ func TestTimeConsuming(t *testing.T) {
 
 	defer response.Body.Close()
 
-	responseContent, err := extractContentFromResponse(response)
+	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		t.Error(err)
 	}
-	if string(responseContent) != TEST_SERVER_2_RESPONSE_BODY {
-		t.Errorf("Did expect that: %v \nwould contain: %v\n", string(responseContent), TEST_SERVER_2_RESPONSE_BODY)
+	if string(responseBody) != TEST_SERVER_2_RESPONSE_BODY {
+		t.Errorf("Did expect response Text: %v \nbut received: %v\n", TEST_SERVER_2_RESPONSE_BODY, string(responseBody))
 	}
-}
-
-func extractContentFromResponse(response *http.Response) (string, error) {
-	responseBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return "", err
-	}
-	httpHeaderEndSequence := "\r\n\r\n"
-	pos := strings.Index(string(responseBody), httpHeaderEndSequence) + len(httpHeaderEndSequence)
-	contentBytes := responseBody[pos:]
-	return string(contentBytes), nil
 }
 
 func sendTestRequest(request *http.Request, responseChannel chan *http.Response) {

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"fmt"
+	"io/ioutil"
 )
 
 func StartHFATServer(port int, forwardingTargets []ForwardingTarget) {
@@ -30,7 +31,12 @@ func (hfs HFatServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if preferredResponse != nil {
-		preferredResponse.Write(w)
+		defer preferredResponse.Body.Close()
+		responseText, err := ioutil.ReadAll(preferredResponse.Body)
+		if err != nil {
+			fmt.Errorf("error parsing http response text: %v\n", err)
+		}
+		w.Write(responseText)
 	}
 }
 
