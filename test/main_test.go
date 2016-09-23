@@ -28,10 +28,10 @@ func TestTimeConsuming(t *testing.T) {
 
 	go server.StartHFATServer(HFAT_SERVER_PORT, []server.ForwardingTarget{
 		{Server: LOCALHOST, Port: TEST_SERVER_1_PORT},
-		{Server: LOCALHOST, Port: TEST_SERVER_2_PORT, Primary:true},
+		{Server: LOCALHOST, Port: TEST_SERVER_2_PORT, Primary: true},
 	})
 
-	testRequest, err := http.NewRequest("GET", "http://" + LOCALHOST + ":" + strconv.Itoa(HFAT_SERVER_PORT) + TEST_PATH_AND_QUERY, bytes.NewBufferString(""))
+	testRequest, err := http.NewRequest("GET", "http://"+LOCALHOST+":"+strconv.Itoa(HFAT_SERVER_PORT)+TEST_PATH_AND_QUERY, bytes.NewBufferString(""))
 	if err != nil {
 		t.Error(err)
 	}
@@ -63,13 +63,25 @@ func TestTimeConsuming(t *testing.T) {
 	}
 
 	defer response.Body.Close()
-	responseBody, err := ioutil.ReadAll(response.Body)
+
+	responseContent, err := extractContentFromResponse(response)
 	if err != nil {
 		t.Error(err)
 	}
-	if !strings.ContainsAny(string(responseBody), TEST_SERVER_2_RESPONSE_BODY) {
-		t.Errorf("Did expect that: %v \nwould contain: %v\n", string(responseBody), TEST_SERVER_2_RESPONSE_BODY)
+	if string(responseContent) != TEST_SERVER_2_RESPONSE_BODY {
+		t.Errorf("Did expect that: %v \nwould contain: %v\n", string(responseContent), TEST_SERVER_2_RESPONSE_BODY)
 	}
+}
+
+func extractContentFromResponse(response *http.Response) (string, error) {
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+	httpHeaderEndSequence := "\r\n\r\n"
+	pos := strings.Index(string(responseBody), httpHeaderEndSequence) + len(httpHeaderEndSequence)
+	contentBytes := responseBody[pos:]
+	return string(contentBytes), nil
 }
 
 func sendTestRequest(request *http.Request, responseChannel chan *http.Response) {
