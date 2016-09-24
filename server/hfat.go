@@ -1,15 +1,15 @@
 package server
 
 import (
-	"net/http"
-	"strconv"
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"strconv"
 )
 
 func StartHFATServer(port int, forwardingTargets []ForwardingTarget) {
-	handler := HFatServer{targets:forwardingTargets}
-	http.ListenAndServe(":" + strconv.Itoa(port), handler)
+	handler := HFatServer{targets: forwardingTargets}
+	http.ListenAndServe(":"+strconv.Itoa(port), handler)
 }
 
 type HFatServer struct {
@@ -32,19 +32,21 @@ func (hfs HFatServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if preferredResponse != nil {
 		defer preferredResponse.Body.Close()
+
 		responseText, err := ioutil.ReadAll(preferredResponse.Body)
 		if err != nil {
 			fmt.Errorf("error parsing http response text: %v\n", err)
 		}
+		w.WriteHeader(preferredResponse.StatusCode)
 		w.Write(responseText)
 	}
 }
 
-func (hfs HFatServer)  prepareTargetRequest(r *http.Request, target ForwardingTarget) *http.Request {
+func (hfs HFatServer) prepareTargetRequest(r *http.Request, target ForwardingTarget) *http.Request {
 	targetRequest := &http.Request{}
 	*targetRequest = *r
-	targetRequest.RequestURI = "";
-	targetRequest.RemoteAddr = "";
+	targetRequest.RequestURI = ""
+	targetRequest.RemoteAddr = ""
 	targetRequest.URL.Host = fmt.Sprintf("%v:%v", target.Server, target.Port)
 	targetRequest.URL.Scheme = "http"
 
