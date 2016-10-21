@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
 echo "STARTING GO TESTS"
+echo "get go-junit-report"
+go get -u github.com/jstemmer/go-junit-report
 
-go test -v ./...
+echo "run tests"
+go test -v ./... | go-junit-report > report.xml
