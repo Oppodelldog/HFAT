@@ -7,15 +7,18 @@ import (
 	"strconv"
 )
 
+// StartHFATServer starts HFAT server
 func StartHFATServer(port int, forwardingTargets []ForwardingTarget) {
 	handler := HFatServer{targets: forwardingTargets}
 	http.ListenAndServe(":"+strconv.Itoa(port), handler)
 }
 
+// HFatServer represents the HFAT server
 type HFatServer struct {
 	targets []ForwardingTarget
 }
 
+// http.Handler interface
 func (hfs HFatServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var preferredResponse *http.Response

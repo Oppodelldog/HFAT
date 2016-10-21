@@ -2,17 +2,20 @@ package config
 
 import (
 	"HFAT/server"
-	"io/ioutil"
-	"fmt"
-	"os"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"os"
 )
 
-type Config struct{
+// Config struct represents HFAT configuration
+// and is used for (de-) serialization from and to config file
+type Config struct {
 	ForwardingTargets []server.ForwardingTarget
-	Port int
+	Port              int
 }
 
+// ReadConfigFromFile loads the HFAT config from disk
 func ReadConfigFromFile() Config {
 
 	file, fileErr := ioutil.ReadFile("./config.json")
@@ -23,7 +26,7 @@ func ReadConfigFromFile() Config {
 
 	var jsonType Config
 	jsonErr := json.Unmarshal(file, &jsonType)
-	if(jsonErr != nil){
+	if jsonErr != nil {
 		fmt.Printf("Json parsing error: %v\n", jsonErr)
 		os.Exit(1)
 	}
