@@ -7,5 +7,5 @@ pipeline:
     image: golang:1.9.2
     commands:
       - go get ./...
-      - go test
+      - go test -v ./...
       - go build
