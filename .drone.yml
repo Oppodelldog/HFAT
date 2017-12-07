@@ -9,3 +9,9 @@ pipeline:
       - go get ./...
       - go test -v ./...
       - go build
+matrix:
+ GO_VERSION:
+   - latest
+   - "1.8"
+   - "1.7"
+   - "1.6"
